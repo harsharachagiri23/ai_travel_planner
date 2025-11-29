@@ -101,9 +101,9 @@ AI Travel Planner solves this by acting like a personal travel intelligence engi
 - Gemini API key (optional, for AI reasoning)
 
 # Set API keys
-export GOOGLE_API_KEY="YOUR_KEY"
-export WEATHER_API_KEY="YOUR_KEY"
-export GEMINI_API_KEY="YOUR_KEY"
+- export GOOGLE_API_KEY="YOUR_KEY"
+- export WEATHER_API_KEY="YOUR_KEY"
+- export GEMINI_API_KEY="YOUR_KEY"
 
 ## 🛠️ Installation & Setup
 
