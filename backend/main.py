@@ -8,7 +8,9 @@ from typing import List, Optional
 import os
 import json
 from datetime import datetime
-
+from dotenv import load_dotenv
+load_dotenv()  # Add this line!
+import google.generativeai as genai
 # Import Google Generative AI
 try:
     import google.generativeai as genai
@@ -19,6 +21,8 @@ except ImportError:
 
 # Initialize FastAPI
 app = FastAPI(title="AI Travel Planner API")
+# timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+# filename = f"logs/travel_plan_{timestamp}.json"
 
 # CORS middleware
 app.add_middleware(
@@ -31,6 +35,7 @@ app.add_middleware(
 
 # Configure Google Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+print("gemini zpi key :", GEMINI_API_KEY)
 if GEMINI_AVAILABLE and GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
@@ -45,7 +50,7 @@ class TravelRequest(BaseModel):
 
 class Agent:
     """Base Agent class for multi-agent system - FIXED VERSION"""
-    def __init__(self, role: str, model_name: str = "gemini-1.5-pro"):
+    def __init__(self, role: str, model_name: str = "gemini-2.5-flash"):
         self.role = role
         self.model_name = model_name
         self.use_ai = GEMINI_AVAILABLE and GEMINI_API_KEY
@@ -193,12 +198,13 @@ class AccommodationAgent(Agent):
         Budget per night: ${budget_per_night}
         Interests: {', '.join(request.interests) if request.interests else 'General'}
 
-        Recommend 1 hotel in JSON format with:
+        Recommend 4-5 hotel in JSON format with:
         - hotel (name)
         - location (area/neighborhood)
         - pricePerNight (number)
         - amenities (list of strings)
         - description
+        - link (official website or Google Maps link)
 
         Return ONLY valid JSON, no markdown formatting.
         """
@@ -292,6 +298,7 @@ class RestaurantAgent(Agent):
         - specialty (what they're known for)
         - priceRange ($, $$, or $$$)
         - mustTry (specific dishes to order)
+        - link (official website link)
 
         Include a mix of local favorites, famous spots, and hidden gems.
         Also include famous local dishes/foods that are must-try.
@@ -496,13 +503,23 @@ async def plan_trip(request: TravelRequest):
     """
     Create a comprehensive travel plan using multi-agent system
     """
+    print("resuqest here ", request)
     try:
         # Validate input
+        print("resquet destination", request.destination)
         if not request.destination:
             raise HTTPException(status_code=400, detail="Destination is required")
 
         # Create travel plan using orchestrator
         travel_plan = orchestrator.create_travel_plan(request)
+        os.makedirs("logs", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"logs/travel_plan_{timestamp}.json"
+
+        with open(filename, "w") as f:
+            json.dump(travel_plan, f, indent=4)
+
+        print(f"Saved travel plan to: {filename}")
 
         return travel_plan
 
