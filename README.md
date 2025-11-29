@@ -158,6 +158,9 @@ npm run dev
 ### Agent Flow Diagram
 ![Agent Flow](images/agentflow.png)
 
+### power point presentation
+![ppt](https://docs.google.com/presentation/d/19-AfwB9AFNZ0bTzN5YR1eGDOfHc99OkhSnX2cs51s1E/edit?usp=sharing)
+
 ## Future Improvements
 
 - Flight API Integration
